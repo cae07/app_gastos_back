@@ -4,7 +4,7 @@ import { TipoDeProdutoService } from './tiposDeProduto.service';
 import { TiposDeProdutos } from './schemas/tiposDeProduto.schema';
 import { throwHttpError } from '../utils/error.handler';
 
-@Controller('tiposDeProduto')
+@Controller('tiposProduto')
 export class TipoDeProdutoController {
   constructor(private readonly tipoDeProdutoService: TipoDeProdutoService) {}
 
