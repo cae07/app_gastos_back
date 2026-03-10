@@ -1,23 +1,22 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { Medida } from './schemas/medidas.schema';
+import { MedidasModel } from './medidas.model';
 
 @Injectable()
 export class MedidasService {
   constructor(
-    @InjectModel(Medida.name) private medidaModel: Model<Medida>,
+    private readonly medidasModel: MedidasModel,
   ) {}
 
   async getAll(): Promise<Medida[]> {
-    return await this.medidaModel.find().exec();
+    return await this.medidasModel.getAll();
   }
 
   async getByAtiva(ativa: boolean): Promise<Medida[]> {
     if (typeof ativa !== 'boolean') {
       throw new BadRequestException('O parâmetro ativa deve ser um booleano');
     }
-    return await this.medidaModel.find({ ativa }).exec();
+    return await this.medidasModel.getByAtiva(ativa);
   }
 
   async getById(medidaId: string): Promise<Medida | null> {
@@ -25,7 +24,7 @@ export class MedidasService {
       throw new BadRequestException('O ID da medida é obrigatório');
     }
     
-    const medida = await this.medidaModel.findById(medidaId).exec();
+    const medida = await this.medidasModel.getById(medidaId);
     if (!medida) {
       throw new NotFoundException('Medida não encontrada');
     }
@@ -36,9 +35,9 @@ export class MedidasService {
   async criarMedida(dados: Partial<Medida>): Promise<Medida> {
     this.validarDadosMedida(dados);
 
-    const medidaExistente = await this.medidaModel.findOne({
+    const medidaExistente = await this.medidasModel.findOne({
       $or: [{ nome: dados.nome }, { sigla: dados.sigla }],
-    }).exec();
+    });
 
     if (medidaExistente) {
       throw new BadRequestException(
@@ -46,8 +45,7 @@ export class MedidasService {
       );
     }
 
-    const novaMedida = new this.medidaModel(dados);
-    return await novaMedida.save();
+    return await this.medidasModel.create(dados);
   }
 
   async update(medidaId: string, dados: Partial<Medida>): Promise<Medida | null> {
@@ -55,7 +53,7 @@ export class MedidasService {
       throw new BadRequestException('O ID da medida é obrigatório');
     }
 
-    const medidaExistente = await this.medidaModel.findById(medidaId).exec();
+    const medidaExistente = await this.medidasModel.getById(medidaId);
     if (!medidaExistente) {
       throw new NotFoundException('Medida não encontrada');
     }
@@ -63,7 +61,7 @@ export class MedidasService {
     this.validarDadosMedida(dados, true);
 
     if (dados.nome || dados.sigla) {
-      const duplicata = await this.medidaModel.findOne({
+      const duplicata = await this.medidasModel.findOne({
         $and: [
           { _id: { $ne: medidaId } },
           {
@@ -73,7 +71,7 @@ export class MedidasService {
             ],
           },
         ],
-      }).exec();
+      });
 
       if (duplicata) {
         throw new BadRequestException(
@@ -82,9 +80,7 @@ export class MedidasService {
       }
     }
 
-    return await this.medidaModel
-      .findByIdAndUpdate(medidaId, dados, { new: true })
-      .exec();
+    return await this.medidasModel.update(medidaId, dados);
   }
 
   async deletarMedida(medidaId: string): Promise<Medida | null> {
@@ -92,12 +88,12 @@ export class MedidasService {
       throw new BadRequestException('O ID da medida é obrigatório');
     }
 
-    const medida = await this.medidaModel.findById(medidaId).exec();
+    const medida = await this.medidasModel.getById(medidaId);
     if (!medida) {
       throw new NotFoundException('Medida não encontrada');
     }
 
-    return await this.medidaModel.findByIdAndDelete(medidaId).exec();
+    return await this.medidasModel.delete(medidaId);
   }
 
   private validarDadosMedida(dados: Partial<Medida>, isUpdate = false): void {
@@ -127,6 +123,10 @@ export class MedidasService {
 
     if (dados.sigla !== undefined && dados.sigla.trim().length === 0) {
       throw new BadRequestException('A sigla não pode estar vazia');
+    }
+
+    if (dados.ativa !== undefined && typeof dados.ativa !== 'boolean') {
+      throw new BadRequestException('O status ativa deve ser um booleano');
     }
 
     if (dados.ativa !== undefined && typeof dados.ativa !== 'boolean') {
