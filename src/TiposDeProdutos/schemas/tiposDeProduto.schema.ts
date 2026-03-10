@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type ProductTypesDocument = HydratedDocument<ProductTypes>;
+export type TiposDeProdutosDocument = HydratedDocument<TiposDeProdutos>;
 
 @Schema({ timestamps: true }) 
-export class ProductTypes {
+export class TiposDeProdutos {
   @Prop({ required: true })
   nome!: string;
 
@@ -12,7 +12,7 @@ export class ProductTypes {
   descricao!: string;
 
   @Prop({ required: true })
-  ativa!: string;
+  ativa!: boolean;
 }
 
-export const ProductTypesSchema = SchemaFactory.createForClass(ProductTypes);
+export const TiposDeProdutosSchema = SchemaFactory.createForClass(TiposDeProdutos);
