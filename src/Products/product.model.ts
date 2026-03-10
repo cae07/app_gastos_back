@@ -17,4 +17,20 @@ export class ProductsModel {
   async getAll(): Promise<Product[]> {
     return this.model.find().exec();
   }
+
+  async getById(id: string): Promise<Product | null> {
+    return this.model.findById(id).exec();
+  }
+
+  async update(productId: string, dados: Partial<Product>): Promise<Product | null> {
+    return this.model.findByIdAndUpdate(productId, dados, { new: true }).exec();
+  }
+
+  async delete(productId: string): Promise<Product | null> {
+    return this.model.findByIdAndDelete(productId).exec();
+  }
+
+  async getByType(productType: string): Promise<Product[]> {
+    return this.model.find({ productType }).exec();
+  }
 }
