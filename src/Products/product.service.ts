@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { ProductsModel } from './product.model';
 import { Product } from './schemas/products.schema';
-import { throwHttpError } from 'src/utils/error.handler';
 
 @Injectable()
 export class ProductService {
@@ -14,56 +12,132 @@ export class ProductService {
   }
 
   async getById(productId: string): Promise<Product | null> {
+    if (!productId) {
+      throw new BadRequestException('O ID do produto é obrigatório');
+    }
+
     const item = await this.productModel.getById(productId);
     if (!item) {
-      throwHttpError(HttpStatus.NOT_FOUND, 'Produto não encontrado');
+      throw new NotFoundException('Produto não encontrado');
     }
     return item;
   }
 
   async criarProduto(dados: Partial<Product>): Promise<Product> {
-    try {
-      return await this.productModel.salvar(dados);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao criar produto';
-      throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, message);
-    }
+    this.validarDadosProduto(dados);
+    return await this.productModel.salvar(dados);
   }
 
   async update(productId: string, dados: Partial<Product>): Promise<Product | null> {
-    try {
-      const produtoExistente = await this.productModel.getById(productId);
-      if (!produtoExistente) {
-        throwHttpError(HttpStatus.NOT_FOUND, 'Produto não encontrado');
-      }
-      Object.assign(produtoExistente, dados);
-      return this.productModel.update(productId, dados);
-
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao atualizar produto';
-      throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    if (!productId) {
+      throw new BadRequestException('O ID do produto é obrigatório');
     }
+
+    const produtoExistente = await this.productModel.getById(productId);
+    if (!produtoExistente) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    this.validarDadosProduto(dados, true);
+    return this.productModel.update(productId, dados);
   }
 
   async deletarProduto(productId: string): Promise<Product | null> {
-    try {
-      const produtoExistente = await this.productModel.getById(productId);
-      if (!produtoExistente) {
-        throwHttpError(HttpStatus.NOT_FOUND, 'Produto não encontrado');
-      }
-      return this.productModel.delete(productId);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao deletar produto';
-      throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    if (!productId) {
+      throw new BadRequestException('O ID do produto é obrigatório');
     }
+
+    const produtoExistente = await this.productModel.getById(productId);
+    if (!produtoExistente) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    return this.productModel.delete(productId);
   }
 
   async getByType(productType: string): Promise<Product[]> {
-    try {
-      return this.productModel.getByType(productType);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao buscar produtos por tipo';
-      throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    if (!productType) {
+      throw new BadRequestException('O tipo de produto é obrigatório');
+    }
+
+    if (typeof productType !== 'string') {
+      throw new BadRequestException('O tipo de produto deve ser uma string');
+    }
+
+    return this.productModel.getByType(productType);
+  }
+
+  private validarDadosProduto(dados: Partial<Product>, isUpdate = false): void {
+    if (!isUpdate && !dados.name) {
+      throw new BadRequestException('O nome do produto é obrigatório');
+    }
+
+    if (!isUpdate && !dados.measure) {
+      throw new BadRequestException('A medida do produto é obrigatória');
+    }
+
+    if (!isUpdate && !dados.medidaId) {
+      throw new BadRequestException('O ID da medida é obrigatório');
+    }
+
+    if (!isUpdate && !dados.productType) {
+      throw new BadRequestException('O tipo de produto é obrigatório');
+    }
+
+    if (!isUpdate && !dados.tipoProdutoId) {
+      throw new BadRequestException('O ID do tipo de produto é obrigatório');
+    }
+
+    if (!isUpdate && !dados.embalagemId) {
+      throw new BadRequestException('O ID da embalagem é obrigatório');
+    }
+
+    if (dados.name !== undefined && typeof dados.name !== 'string') {
+      throw new BadRequestException('O nome deve ser uma string');
+    }
+
+    if (dados.name !== undefined && dados.name.trim().length === 0) {
+      throw new BadRequestException('O nome não pode estar vazio');
+    }
+
+    if (dados.measure !== undefined && typeof dados.measure !== 'string') {
+      throw new BadRequestException('A medida deve ser uma string');
+    }
+
+    if (dados.measure !== undefined && dados.measure.trim().length === 0) {
+      throw new BadRequestException('A medida não pode estar vazia');
+    }
+
+    if (dados.medidaId !== undefined && typeof dados.medidaId !== 'string') {
+      throw new BadRequestException('O ID da medida deve ser uma string');
+    }
+
+    if (dados.medidaId !== undefined && dados.medidaId.trim().length === 0) {
+      throw new BadRequestException('O ID da medida não pode estar vazio');
+    }
+
+    if (dados.productType !== undefined && typeof dados.productType !== 'string') {
+      throw new BadRequestException('O tipo de produto deve ser uma string');
+    }
+
+    if (dados.productType !== undefined && dados.productType.trim().length === 0) {
+      throw new BadRequestException('O tipo de produto não pode estar vazio');
+    }
+
+    if (dados.tipoProdutoId !== undefined && typeof dados.tipoProdutoId !== 'string') {
+      throw new BadRequestException('O ID do tipo de produto deve ser uma string');
+    }
+
+    if (dados.tipoProdutoId !== undefined && dados.tipoProdutoId.trim().length === 0) {
+      throw new BadRequestException('O ID do tipo de produto não pode estar vazio');
+    }
+
+    if (dados.embalagemId !== undefined && typeof dados.embalagemId !== 'string') {
+      throw new BadRequestException('O ID da embalagem deve ser uma string');
+    }
+
+    if (dados.embalagemId !== undefined && dados.embalagemId.trim().length === 0) {
+      throw new BadRequestException('O ID da embalagem não pode estar vazio');
     }
   }
 }
