@@ -2,6 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 
 import { TiposDeProdutos } from './schemas/tiposDeProduto.schema';
 import { TiposDeProdutosModel } from './tiposDeProduto.model';
+import { toClient } from 'src/utils/toClient';
 
 @Injectable()
 export class TipoDeProdutoService {
@@ -10,11 +11,13 @@ export class TipoDeProdutoService {
   ) {}
 
   async getAll(): Promise<TiposDeProdutos[]> {
-    return await this.tipoDeProdutoModel.getAll();
+    const tiposDeProdutos = await this.tipoDeProdutoModel.getAll();
+    return toClient(tiposDeProdutos);
   }
 
   async getAtivas(ativa: boolean): Promise<TiposDeProdutos[]> {
-    return await this.tipoDeProdutoModel.getAtivas(ativa);
+    const tiposDeProdutos = await this.tipoDeProdutoModel.getAtivas(ativa);
+    return toClient(tiposDeProdutos);
   }
 
   async getById(tipoDeProdutoId: string): Promise<TiposDeProdutos | null> {
@@ -27,7 +30,7 @@ export class TipoDeProdutoService {
       throw new NotFoundException('Tipo de produto não encontrado');
     }
 
-    return tipoDeProduto;
+    return toClient(tipoDeProduto);
   }
 
   async create(dados: Partial<TiposDeProdutos>): Promise<TiposDeProdutos> {
@@ -43,7 +46,8 @@ export class TipoDeProdutoService {
       );
     }
 
-    return await this.tipoDeProdutoModel.create(dados);
+    const tipoDeProduto = await this.tipoDeProdutoModel.create(dados);
+    return toClient(tipoDeProduto);
   }
 
   async update(tipoDeProdutoId: string, dados: Partial<TiposDeProdutos>): Promise<TiposDeProdutos | null> {
@@ -73,8 +77,9 @@ export class TipoDeProdutoService {
       }
     }
 
-    return await this.tipoDeProdutoModel
-      .update(tipoDeProdutoId, dados)
+    const tipoDeProduto = await this.tipoDeProdutoModel
+      .update(tipoDeProdutoId, dados);
+    return toClient(tipoDeProduto);
   }
 
   async delete(tipoDeProdutoId: string): Promise<TiposDeProdutos | null> {

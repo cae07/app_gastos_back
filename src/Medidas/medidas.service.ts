@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Medida } from './schemas/medidas.schema';
 import { MedidasModel } from './medidas.model';
+import { toClient } from '../utils/toClient';
 
 @Injectable()
 export class MedidasService {
@@ -8,58 +9,53 @@ export class MedidasService {
     private readonly medidasModel: MedidasModel,
   ) {}
 
-  async getAll(): Promise<Medida[]> {
-    return await this.medidasModel.getAll();
+  async getAll(): Promise<any[]> {
+    const result = await this.medidasModel.getAll();
+    return toClient(result);
   }
 
-  async getByAtiva(ativa: boolean): Promise<Medida[]> {
+  async getByAtiva(ativa: boolean): Promise<any[]> {
     if (typeof ativa !== 'boolean') {
       throw new BadRequestException('O parâmetro ativa deve ser um booleano');
     }
-    return await this.medidasModel.getByAtiva(ativa);
+    const result = await this.medidasModel.getByAtiva(ativa);
+    return toClient(result);
   }
 
-  async getById(medidaId: string): Promise<Medida | null> {
+  async getById(medidaId: string): Promise<any | null> {
     if (!medidaId) {
       throw new BadRequestException('O ID da medida é obrigatório');
     }
-    
     const medida = await this.medidasModel.getById(medidaId);
     if (!medida) {
       throw new NotFoundException('Medida não encontrada');
     }
-    
-    return medida;
+    return toClient(medida);
   }
 
-  async criarMedida(dados: Partial<Medida>): Promise<Medida> {
+  async criarMedida(dados: Partial<Medida>): Promise<any> {
     this.validarDadosMedida(dados);
-
     const medidaExistente = await this.medidasModel.findOne({
       $or: [{ nome: dados.nome }, { sigla: dados.sigla }],
     });
-
     if (medidaExistente) {
       throw new BadRequestException(
         'Já existe uma medida com este nome ou sigla',
       );
     }
-
-    return await this.medidasModel.create(dados);
+    const nova = await this.medidasModel.create(dados);
+    return toClient(nova);
   }
 
-  async update(medidaId: string, dados: Partial<Medida>): Promise<Medida | null> {
+  async update(medidaId: string, dados: Partial<Medida>): Promise<any | null> {
     if (!medidaId) {
       throw new BadRequestException('O ID da medida é obrigatório');
     }
-
     const medidaExistente = await this.medidasModel.getById(medidaId);
     if (!medidaExistente) {
       throw new NotFoundException('Medida não encontrada');
     }
-
     this.validarDadosMedida(dados, true);
-
     if (dados.nome || dados.sigla) {
       const duplicata = await this.medidasModel.findOne({
         $and: [
@@ -72,15 +68,14 @@ export class MedidasService {
           },
         ],
       });
-
       if (duplicata) {
         throw new BadRequestException(
           'Já existe outra medida com este nome ou sigla',
         );
       }
     }
-
-    return await this.medidasModel.update(medidaId, dados);
+    const updated = await this.medidasModel.update(medidaId, dados);
+    return toClient(updated);
   }
 
   async deletarMedida(medidaId: string): Promise<Medida | null> {

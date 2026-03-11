@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { QueryFilter } from 'mongoose';
 import { LancamentosModel } from './lancamento.model';
+import { toClient } from '../utils/toClient';
 import { Lancamentos, LancamentosDocument } from './schemas/lancamentos.schema';
 
 @Injectable()
@@ -9,20 +10,20 @@ export class LancamentoService {
 
   constructor(private readonly lancamentosModel: LancamentosModel) {}
 
-  async getAll(): Promise<Lancamentos[]> {
-    return this.lancamentosModel.getAll();
+  async getAll(): Promise<any[]> {
+    const result = await this.lancamentosModel.getAll();
+    return toClient(result);
   }
 
-  async getById(lancamentoId: string): Promise<Lancamentos | null> {
+  async getById(lancamentoId: string): Promise<any | null> {
     if (!lancamentoId) {
       throw new BadRequestException('O ID do lançamento é obrigatório');
     }
-
     const item = await this.lancamentosModel.getById(lancamentoId);
     if (!item) {
       throw new NotFoundException('Lançamento não encontrado');
     }
-    return item;
+    return toClient(item);
   }
 
   async getByFilters(params: {
@@ -34,11 +35,10 @@ export class LancamentoService {
     data_lte?: string;
     _sort?: string;
     _order?: 'asc' | 'desc';
-  }): Promise<Lancamentos[]> {
+  }): Promise<any[]> {
     this.validarFiltros(params);
 
     const filters: QueryFilter<LancamentosDocument> = {};
-
     if (params.ano) filters.ano = Number(params.ano);
     if (params.mes) filters.mes = Number(params.mes);
     if (params.produtoId) filters.produtoId = params.produtoId;
@@ -67,57 +67,52 @@ export class LancamentoService {
       sort = { [params._sort]: params._order === 'desc' ? -1 : 1 };
     }
 
-    return this.lancamentosModel.findByFilters(filters, sort);
+    const result = await this.lancamentosModel.findByFilters(filters, sort);
+    return toClient(result);
   }
 
-  async create(dados: Partial<Lancamentos>): Promise<Lancamentos> {
+  async create(dados: Partial<Lancamentos>): Promise<any> {
     this.validarDadosLancamento(dados);
-    return this.lancamentosModel.create(dados);
+    const novo = await this.lancamentosModel.create(dados);
+    return toClient(novo);
   }
 
-  async update(lancamentoId: string, dados: Partial<Lancamentos>): Promise<Lancamentos | null> {
+  async update(lancamentoId: string, dados: Partial<Lancamentos>): Promise<any | null> {
     if (!lancamentoId) {
       throw new BadRequestException('O ID do lançamento é obrigatório');
     }
-
     const item = await this.lancamentosModel.getById(lancamentoId);
     if (!item) {
       throw new NotFoundException('Lançamento não encontrado');
     }
-
     this.validarDadosLancamento(dados, true);
-    return this.lancamentosModel.update(lancamentoId, dados);
+    const updated = await this.lancamentosModel.update(lancamentoId, dados);
+    return toClient(updated);
   }
 
-  async delete(lancamentoId: string): Promise<Lancamentos | null> {
+  async delete(lancamentoId: string): Promise<any | null> {
     if (!lancamentoId) {
       throw new BadRequestException('O ID do lançamento é obrigatório');
     }
-
     const item = await this.lancamentosModel.delete(lancamentoId);
     if (!item) {
       throw new NotFoundException('Lançamento não encontrado');
     }
-    return item;
+    return toClient(item);
   }
 
-  async getByAnoMes(ano: number, mes: number): Promise<Lancamentos[]> {
+  async getByAnoMes(ano: number, mes: number): Promise<any[]> {
     if (!ano || typeof ano !== 'number') {
       throw new BadRequestException('O ano deve ser um número válido');
     }
-
     if (!mes || typeof mes !== 'number') {
       throw new BadRequestException('O mês deve ser um número válido');
     }
-
     if (!this.MONTHS_VALID.includes(mes)) {
       throw new BadRequestException('O mês deve estar entre 1 e 12');
     }
-
-    return this.lancamentosModel.findByFilters({ 
-      ano: Number(ano), 
-      mes: Number(mes) 
-    });
+    const result = await this.lancamentosModel.findByFilters({ ano: Number(ano), mes: Number(mes) });
+    return toClient(result);
   }
 
   private validarDadosLancamento(dados: Partial<Lancamentos>, isUpdate = false): void {

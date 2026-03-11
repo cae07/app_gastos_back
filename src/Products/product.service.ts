@@ -1,45 +1,47 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 
+
 import { ProductsModel } from './product.model';
 import { Product } from './schemas/products.schema';
+import { toClient } from '../utils/toClient';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly productModel: ProductsModel) {}
 
-  async getAll(): Promise<Product[]> {
-    return await this.productModel.getAll();
+  async getAll(): Promise<any[]> {
+    const result = await this.productModel.getAll();
+    return toClient(result);
   }
 
-  async getById(productId: string): Promise<Product | null> {
+  async getById(productId: string): Promise<any | null> {
     if (!productId) {
       throw new BadRequestException('O ID do produto é obrigatório');
     }
-
     const item = await this.productModel.getById(productId);
     if (!item) {
       throw new NotFoundException('Produto não encontrado');
     }
-    return item;
+    return toClient(item);
   }
 
-  async criarProduto(dados: Partial<Product>): Promise<Product> {
+  async criarProduto(dados: Partial<Product>): Promise<any> {
     this.validarDadosProduto(dados);
-    return await this.productModel.salvar(dados);
+    const novo = await this.productModel.salvar(dados);
+    return toClient(novo);
   }
 
-  async update(productId: string, dados: Partial<Product>): Promise<Product | null> {
+  async update(productId: string, dados: Partial<Product>): Promise<any | null> {
     if (!productId) {
       throw new BadRequestException('O ID do produto é obrigatório');
     }
-
     const produtoExistente = await this.productModel.getById(productId);
     if (!produtoExistente) {
       throw new NotFoundException('Produto não encontrado');
     }
-
     this.validarDadosProduto(dados, true);
-    return this.productModel.update(productId, dados);
+    const updated = await this.productModel.update(productId, dados);
+    return toClient(updated);
   }
 
   async deletarProduto(productId: string): Promise<Product | null> {
@@ -55,16 +57,15 @@ export class ProductService {
     return this.productModel.delete(productId);
   }
 
-  async getByType(productType: string): Promise<Product[]> {
+  async getByType(productType: string): Promise<any[]> {
     if (!productType) {
       throw new BadRequestException('O tipo de produto é obrigatório');
     }
-
     if (typeof productType !== 'string') {
       throw new BadRequestException('O tipo de produto deve ser uma string');
     }
-
-    return this.productModel.getByType(productType);
+    const result = await this.productModel.getByType(productType);
+    return toClient(result);
   }
 
   private validarDadosProduto(dados: Partial<Product>, isUpdate = false): void {
