@@ -16,6 +16,9 @@ export class TipoDeProdutoController {
         }
       return await this.tipoDeProdutoService.getAll();
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar tipos de produtos');
     }
   }
@@ -25,6 +28,9 @@ export class TipoDeProdutoController {
     try {
       return await this.tipoDeProdutoService.getById(tipoDeProdutoId);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar tipo de produto');
     }
   }
@@ -34,6 +40,9 @@ export class TipoDeProdutoController {
     try {
       return await this.tipoDeProdutoService.create(dados);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao criar tipo de produto');
     }
   }
@@ -46,6 +55,9 @@ export class TipoDeProdutoController {
     try {
       return await this.tipoDeProdutoService.update(tipoDeProdutoId, dados);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao atualizar tipo de produto');
     }
   }
@@ -55,6 +67,9 @@ export class TipoDeProdutoController {
     try {
       return await this.tipoDeProdutoService.delete(tipoDeProdutoId);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao deletar tipo de produto');
     }
   }

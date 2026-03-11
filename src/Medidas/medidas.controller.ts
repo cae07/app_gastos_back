@@ -16,6 +16,9 @@ export class MedidasController {
             }
             return await this.medidasService.getAll();
         } catch (error) {
+            if (error instanceof Error && 'status' in error) {
+                throw error;
+            }
             throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar medidas');
         }
     }
@@ -25,6 +28,9 @@ export class MedidasController {
         try {
             return await this.medidasService.getById(medidaId);
         } catch (error) {
+            if (error instanceof Error && 'status' in error) {
+                throw error;
+            }
             throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar medida');
         }
     }
@@ -34,6 +40,9 @@ export class MedidasController {
         try {
             return await this.medidasService.criarMedida(dados);
         } catch (error) {
+            if (error instanceof Error && 'status' in error) {
+                throw error;
+            }
             throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao criar medida');
         }
     }
@@ -43,6 +52,9 @@ export class MedidasController {
         try {
             return await this.medidasService.update(medidaId, dados);
         } catch (error) {
+            if (error instanceof Error && 'status' in error) {
+                throw error;
+            }
             throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao atualizar medida');
         }
     }
@@ -52,6 +64,9 @@ export class MedidasController {
         try {
             return await this.medidasService.deletarMedida(medidaId);
         } catch (error) {
+            if (error instanceof Error && 'status' in error) {
+                throw error;
+            }
             throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao deletar medida');
         }
     }

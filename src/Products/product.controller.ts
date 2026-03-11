@@ -16,6 +16,9 @@ export class ProductController {
       }
       return await this.productService.getAll();
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar produtos');
     }
   }
@@ -25,6 +28,9 @@ export class ProductController {
     try {
       return await this.productService.getById(productId);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao buscar produto');
     }
   }
@@ -34,6 +40,9 @@ export class ProductController {
     try {
       return await this.productService.criarProduto(dados);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao criar produto');
     }
   }
@@ -43,6 +52,9 @@ export class ProductController {
     try {
       return await this.productService.update(productId, dados);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao atualizar produto');
     }
   }
@@ -52,6 +64,9 @@ export class ProductController {
     try {
       return await this.productService.deletarProduto(productId);
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw error;
+      }
       throwHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Erro ao deletar produto');
     }
   }
