@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './Products/product.module';
 import { LancamentoModule } from './Lancamentos/lancamento.module';
 import { MedidasModule } from './Medidas/medidas.module';
+import { TipoDeProdutoModule } from './TiposDeProdutos/tiposDeProduto.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MedidasModule } from './Medidas/medidas.module';
     
     ProductModule,
     LancamentoModule,
+    TipoDeProdutoModule,
     MedidasModule
   ],
 })
