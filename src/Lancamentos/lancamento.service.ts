@@ -72,6 +72,7 @@ export class LancamentoService {
   }
 
   async create(dados: Partial<Lancamentos>): Promise<any> {
+    dados.value = Number(dados.value);
     this.validarDadosLancamento(dados);
     const novo = await this.lancamentosModel.create(dados);
     return toClient(novo);
