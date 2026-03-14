@@ -23,7 +23,7 @@ export class EmbalagensModel {
     }
 
     async update(id: string, dados: Partial<Embalagem>): Promise<Embalagem | null> {
-        return this.model.findByIdAndUpdate(id, dados, { new: true }).exec();
+        return this.model.findByIdAndUpdate(id, dados, { returnDocument: 'after' }).exec();
     }
 
     async delete(id: string): Promise<Embalagem | null> {

@@ -86,6 +86,7 @@ export class LancamentoService {
     if (!item) {
       throw new NotFoundException('Lançamento não encontrado');
     }
+    dados.value = Number(dados.value);
     this.validarDadosLancamento(dados, true);
     const updated = await this.lancamentosModel.update(lancamentoId, dados);
     return toClient(updated);
@@ -117,116 +118,86 @@ export class LancamentoService {
   }
 
   private validarDadosLancamento(dados: Partial<Lancamentos>, isUpdate = false): void {
-    if (!isUpdate && !dados.produtoId) {
-      throw new BadRequestException('O ID do produto é obrigatório');
+    // Funções auxiliares
+    const validateRequiredString = (value: any, fieldName: string, msg: string) => {
+      if (value === undefined || value === null || value === '') {
+        throw new BadRequestException(msg);
+      }
+      if (typeof value !== 'string') {
+        throw new BadRequestException(`${fieldName} deve ser uma string`);
+      }
+      if (value.trim().length === 0) {
+        throw new BadRequestException(`${fieldName} não pode estar vazio`);
+      }
+    };
+
+    const validateRequiredNumber = (value: any, fieldName: string, msg: string) => {
+      if (value === undefined || value === null) {
+        throw new BadRequestException(msg);
+      }
+      if (typeof value !== 'number') {
+        throw new BadRequestException(`${fieldName} deve ser um número`);
+      }
+    };
+
+    const validatePositiveNumber = (value: any, fieldName: string, msg: string) => {
+      validateRequiredNumber(value, fieldName, msg);
+      if (value <= 0) {
+        throw new BadRequestException(`${fieldName} deve ser maior que zero`);
+      }
+    };
+
+    const validateNumberInRange = (value: any, fieldName: string, min: number, max: number, msg: string) => {
+      validateRequiredNumber(value, fieldName, msg);
+      if (value < min || value > max) {
+        throw new BadRequestException(`${fieldName} deve estar entre ${min} e ${max}`);
+      }
+    };
+
+    // Validações obrigatórias para criação
+    if (!isUpdate) {
+      validateRequiredString(dados.produtoName, 'O nome do produto', 'O nome do produto é obrigatório');
+      validateRequiredNumber(dados.quantity, 'A quantidade', 'A quantidade é obrigatória');
+      validateRequiredNumber(dados.value, 'O valor', 'O valor é obrigatório');
+      validateRequiredNumber(dados.ano, 'O ano', 'O ano é obrigatório');
+      validateRequiredNumber(dados.mes, 'O mês', 'O mês é obrigatório');
+      validateRequiredString(dados.embalagemId, 'O ID da embalagem', 'O ID da embalagem é obrigatório');
+      validateRequiredString(dados.categoria, 'A categoria', 'A categoria é obrigatória');
+      validateRequiredString(dados.mesNome, 'O nome do mês', 'O nome do mês é obrigatório');
     }
 
-    if (!isUpdate && !dados.produtoName) {
-      throw new BadRequestException('O nome do produto é obrigatório');
+    if (dados.produtoName !== undefined) {
+      validateRequiredString(dados.produtoName, 'O nome do produto', 'O nome do produto é obrigatório');
     }
-
-    if (!isUpdate && dados.quantity === undefined) {
-      throw new BadRequestException('A quantidade é obrigatória');
-    }
-
-    if (!isUpdate && dados.value === undefined) {
-      throw new BadRequestException('O valor é obrigatório');
-    }
-
-    if (!isUpdate && !dados.ano) {
-      throw new BadRequestException('O ano é obrigatório');
-    }
-
-    if (!isUpdate && !dados.mes) {
-      throw new BadRequestException('O mês é obrigatório');
-    }
-
-    if (!isUpdate && !dados.embalagemId) {
-      throw new BadRequestException('O ID da embalagem é obrigatório');
-    }
-
-    if (!isUpdate && !dados.categoria) {
-      throw new BadRequestException('A categoria é obrigatória');
-    }
-
-    if (!isUpdate && !dados.mesNome) {
-      throw new BadRequestException('O nome do mês é obrigatório');
-    }
-
-    if (dados.produtoId !== undefined && typeof dados.produtoId !== 'string') {
-      throw new BadRequestException('O ID do produto deve ser uma string');
-    }
-
-    if (dados.produtoId !== undefined && dados.produtoId.trim().length === 0) {
-      throw new BadRequestException('O ID do produto não pode estar vazio');
-    }
-
-    if (dados.produtoName !== undefined && typeof dados.produtoName !== 'string') {
-      throw new BadRequestException('O nome do produto deve ser uma string');
-    }
-
-    if (dados.produtoName !== undefined && dados.produtoName.trim().length === 0) {
-      throw new BadRequestException('O nome do produto não pode estar vazio');
-    }
-
     if (dados.quantity !== undefined) {
-      if (typeof dados.quantity !== 'number') {
-        throw new BadRequestException('A quantidade deve ser um número');
-      }
-      if (dados.quantity <= 0) {
-        throw new BadRequestException('A quantidade deve ser maior que zero');
-      }
+      validatePositiveNumber(dados.quantity, 'A quantidade', 'A quantidade é obrigatória');
     }
-
     if (dados.value !== undefined) {
-      if (typeof dados.value !== 'number') {
-        throw new BadRequestException('O valor deve ser um número');
-      }
-      if (dados.value <= 0) {
-        throw new BadRequestException('O valor deve ser maior que zero');
-      }
+      validatePositiveNumber(dados.value, 'O valor', 'O valor é obrigatório');
     }
-
     if (dados.ano !== undefined) {
-      if (typeof dados.ano !== 'number') {
-        throw new BadRequestException('O ano deve ser um número');
-      }
-      if (dados.ano < 1900 || dados.ano > 2100) {
-        throw new BadRequestException('O ano deve estar entre 1900 e 2100');
-      }
+      validateNumberInRange(dados.ano, 'O ano', 1900, 2100, 'O ano é obrigatório');
     }
-
     if (dados.mes !== undefined) {
-      if (typeof dados.mes !== 'number') {
-        throw new BadRequestException('O mês deve ser um número');
-      }
+      validateRequiredNumber(dados.mes, 'O mês', 'O mês é obrigatório');
       if (!this.MONTHS_VALID.includes(dados.mes)) {
         throw new BadRequestException('O mês deve estar entre 1 e 12');
       }
     }
-
-    if (dados.embalagemId !== undefined && typeof dados.embalagemId !== 'string') {
-      throw new BadRequestException('O ID da embalagem deve ser uma string');
+    if (dados.embalagemId !== undefined) {
+      validateRequiredString(dados.embalagemId, 'O ID da embalagem', 'O ID da embalagem é obrigatório');
     }
-
-    if (dados.embalagemId !== undefined && dados.embalagemId.trim().length === 0) {
-      throw new BadRequestException('O ID da embalagem não pode estar vazio');
+    if (dados.categoria !== undefined) {
+      validateRequiredString(dados.categoria, 'A categoria', 'A categoria é obrigatória');
     }
-
-    if (dados.categoria !== undefined && typeof dados.categoria !== 'string') {
-      throw new BadRequestException('A categoria deve ser uma string');
+    if (dados.mesNome !== undefined) {
+      validateRequiredString(dados.mesNome, 'O nome do mês', 'O nome do mês é obrigatório');
     }
-
-    if (dados.categoria !== undefined && dados.categoria.trim().length === 0) {
-      throw new BadRequestException('A categoria não pode estar vazia');
+    if (dados.medidaId !== undefined) {
+      validateRequiredString(dados.medidaId, 'O ID da medida', 'O ID da medida é obrigatório');
     }
-
-    if (dados.mesNome !== undefined && typeof dados.mesNome !== 'string') {
-      throw new BadRequestException('O nome do mês deve ser uma string');
-    }
-
-    if (dados.mesNome !== undefined && dados.mesNome.trim().length === 0) {
-      throw new BadRequestException('O nome do mês não pode estar vazio');
+    if (dados.tipoProdutoId !== undefined) {
+      validateRequiredString(dados.tipoProdutoId, 'O ID do tipo de produto', 'O ID do tipo de produto é obrigatório');
     }
   }
 

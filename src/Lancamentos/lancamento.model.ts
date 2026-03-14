@@ -23,7 +23,7 @@ export class LancamentosModel {
   }
 
   async update(id: string, dados: Partial<Lancamentos>): Promise<Lancamentos | null> {
-    return this.model.findByIdAndUpdate(id, dados, { new: true }).exec();
+    return this.model.findByIdAndUpdate(id, dados, { returnDocument: 'after' }).exec();
   }
 
   async delete(id: string): Promise<Lancamentos | null> {

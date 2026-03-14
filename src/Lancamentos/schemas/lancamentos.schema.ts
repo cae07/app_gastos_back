@@ -6,9 +6,6 @@ export type LancamentosDocument = HydratedDocument<Lancamentos>;
 @Schema({ timestamps: true }) 
 export class Lancamentos {
   @Prop({ required: true })
-  produtoId!: string;
-
-  @Prop({ required: true })
   produtoName!: string;
 
   @Prop({ required: true })
@@ -31,6 +28,12 @@ export class Lancamentos {
 
   @Prop({ required: true })
   mesNome!: string;
+
+  @Prop({ required: true })
+  medidaId!: string;
+
+  @Prop({ required: true })
+  tipoProdutoId!: string;
 }
 
 export const LancamentosSchema = SchemaFactory.createForClass(Lancamentos);

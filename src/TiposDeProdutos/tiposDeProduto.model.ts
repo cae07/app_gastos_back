@@ -28,7 +28,7 @@ export class TiposDeProdutosModel {
 
   async update(tipoDeProdutoId: string, dados: Partial<TiposDeProdutos>): Promise<TiposDeProdutos | null> {
     return await this.tiposDeProdutosModel
-      .findByIdAndUpdate(tipoDeProdutoId, dados, { new: true })
+      .findByIdAndUpdate(tipoDeProdutoId, dados, { returnDocument: 'after' })
       .exec();
   }
 

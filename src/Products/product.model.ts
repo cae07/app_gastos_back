@@ -23,7 +23,7 @@ export class ProductsModel {
   }
 
   async update(productId: string, dados: Partial<Product>): Promise<Product | null> {
-    return this.model.findByIdAndUpdate(productId, dados, { new: true }).exec();
+    return this.model.findByIdAndUpdate(productId, dados, { returnDocument: 'after' }).exec();
   }
 
   async delete(productId: string): Promise<Product | null> {

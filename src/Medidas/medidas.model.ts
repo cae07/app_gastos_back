@@ -28,7 +28,7 @@ export class MedidasModel {
 
   async update(medidaId: string, dados: Partial<Medida>): Promise<Medida | null> {
     return await this.medidaModel
-      .findByIdAndUpdate(medidaId, dados, { new: true })
+      .findByIdAndUpdate(medidaId, dados, { returnDocument: 'after' })
       .exec();
   }
 
