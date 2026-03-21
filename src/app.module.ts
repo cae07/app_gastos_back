@@ -7,6 +7,7 @@ import { LancamentoModule } from './Lancamentos/lancamento.module';
 import { MedidasModule } from './Medidas/medidas.module';
 import { TipoDeProdutoModule } from './TiposDeProdutos/tiposDeProduto.module';
 import { EmbalagensModule } from './Embalagens/embalagens.module';
+import { TipoDeGastosModule } from './TiposDeGastos/tiposDeGastos.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { EmbalagensModule } from './Embalagens/embalagens.module';
     LancamentoModule,
     TipoDeProdutoModule,
     MedidasModule,
-    EmbalagensModule
+    EmbalagensModule,
+    TipoDeGastosModule
   ],
 })
 export class AppModule {}
