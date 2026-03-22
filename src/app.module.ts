@@ -29,11 +29,14 @@ import { HealthModule } from './Health/health.module';
 
         return {
           uri,
-          serverSelectionTimeoutMS: 5000,
-          connectTimeoutMS: 5000,
-          // Buffer para serverless (evita reconectar a cada request)
+          serverSelectionTimeoutMS: 10000,
+          connectTimeoutMS: 10000,
           bufferCommands: false,
           socketTimeoutMS: 45000,
+          // Otimizações para serverless/Lambda
+          maxPoolSize: 1,
+          minPoolSize: 0,
+          retryWrites: true,
         };
       },
     }),
