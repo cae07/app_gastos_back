@@ -9,8 +9,14 @@ export class GastosController {
   constructor(private readonly gastosService: GastosService) {}
 
   @Get()
-  async getAll(): Promise<Gastos[]> {
+  async getAll(
+    @Query('ano') ano?: number,
+    @Query('mes') mes?: number,
+  ): Promise<Gastos[]> {
     try {
+      if (ano !== undefined || mes !== undefined) {
+        return await this.gastosService.getByFilters({ ano, mes });
+      }
       return await this.gastosService.getAll();
     } catch (error) {
       if (error instanceof Error && 'status' in error) {

@@ -227,7 +227,7 @@ export class GastosValidator {
 
     this.validateDescricao(dados.descricao, isUpdate);
     this.validateValor(dados.valor, isUpdate);
-    this.validateTipoDeGastoId(dados.tipoDeGastoId, isUpdate);
+    this.validateTipoDeGastoId(dados.tipoGastoId, isUpdate);
   }
 }
 

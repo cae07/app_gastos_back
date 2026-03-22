@@ -1,8 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { QueryFilter } from 'mongoose';
 import { GastosModel } from './gastos.model';
 import { toClient } from '../utils/toClient';
-import { Gastos, GastosDocument } from './schemas/gastos.schema';
+import { Gastos } from './schemas/gastos.schema';
 import { GastosValidator } from './validators/gastos.validators';
 
 @Injectable()
@@ -54,6 +53,11 @@ export class GastosService {
     if (!result) {
       throw new NotFoundException('Gasto não encontrado para exclusão');
     }
+    return toClient(result);
+  }
+
+  async getByFilters(filtros: { ano?: number; mes?: number }): Promise<any[]> {
+    const result = await this.gastosModel.getByFilters(filtros);
     return toClient(result);
   }
 } 

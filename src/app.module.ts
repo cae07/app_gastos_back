@@ -8,7 +8,7 @@ import { MedidasModule } from './Medidas/medidas.module';
 import { TipoDeProdutoModule } from './TiposDeProdutos/tiposDeProduto.module';
 import { EmbalagensModule } from './Embalagens/embalagens.module';
 import { TipoDeGastosModule } from './TiposDeGastos/tiposDeGastos.module';
-
+import { GastosModule } from './Gastos/gastos.module';
 @Module({
   imports: [
     // 1. Carrega o .env
@@ -24,7 +24,8 @@ import { TipoDeGastosModule } from './TiposDeGastos/tiposDeGastos.module';
     TipoDeProdutoModule,
     MedidasModule,
     EmbalagensModule,
-    TipoDeGastosModule
+    TipoDeGastosModule,
+    GastosModule
   ],
 })
 export class AppModule {}

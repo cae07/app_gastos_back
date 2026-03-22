@@ -140,7 +140,7 @@ export class Exemplo5_BuilderPattern {
         })
         // Outra validação customizada
         .addRule('tipo-gasto-valido', () => {
-          GastosValidator.validateTipoDeGastoId(dados.tipoDeGastoId);
+          GastosValidator.validateTipoDeGastoId(dados.tipoGastoId);
         })
         .validate();
 
@@ -161,7 +161,7 @@ export class Exemplo6_CasosReais {
     const novoGasto: Partial<Gastos> = {
       descricao: 'Aluguel Escritório',
       valor: 2500.00,
-      tipoDeGastoId: '507f1f77bcf86cd799439011',
+      tipoGastoId: '507f1f77bcf86cd799439011',
     };
 
     try {
@@ -207,7 +207,7 @@ export class Exemplo6_CasosReais {
     const dadosInvalidos: Partial<Gastos> = {
       descricao: 'AB', // Muito curto!
       valor: -100, // Negativo!
-      tipoDeGastoId: 'invalid-id', // Não é ObjectId!
+      tipoGastoId: 'invalid-id', // Não é ObjectId!
     };
 
     try {
@@ -232,8 +232,8 @@ export class Exemplo6_CasosReais {
         console.log('✓ Valor válido');
       }
 
-      if (dados.tipoDeGastoId) {
-        GastosValidator.validateTipoDeGastoId(dados.tipoDeGastoId);
+      if (dados.tipoGastoId) {
+        GastosValidator.validateTipoDeGastoId(dados.tipoGastoId);
         console.log('✓ Tipo de Gasto válido');
       }
 
@@ -254,7 +254,7 @@ export class Exemplo7_Testes {
     const dados: Partial<Gastos> = {
       descricao: 'Despesa de Escritório',
       valor: 150.50,
-      tipoDeGastoId: '507f1f77bcf86cd799439011',
+      tipoGastoId: '507f1f77bcf86cd799439011',
     };
 
     expect(() => {
@@ -267,7 +267,7 @@ export class Exemplo7_Testes {
     const dados: Partial<Gastos> = {
       descricao: 'AB',
       valor: 150.50,
-      tipoDeGastoId: '507f1f77bcf86cd799439011',
+      tipoGastoId: '507f1f77bcf86cd799439011',
     };
 
     expect(() => {
@@ -347,7 +347,7 @@ async function executarExemplos() {
   await ex1.criar({
     descricao: 'Despesa Válida',
     valor: 100,
-    tipoDeGastoId: '507f1f77bcf86cd799439011',
+    tipoGastoId: '507f1f77bcf86cd799439011',
   });
 
   // Exemplo 2

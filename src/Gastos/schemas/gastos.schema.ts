@@ -12,7 +12,13 @@ export class Gastos {
   valor!: number;
 
   @Prop({ required: true })
-  tipoDeGastoId!: string;
+  tipoGastoId!: string;
+
+  @Prop()
+  ano?: number;
+
+  @Prop()
+  mes?: number;
 }
 
 export const GastosSchema = SchemaFactory.createForClass(Gastos);

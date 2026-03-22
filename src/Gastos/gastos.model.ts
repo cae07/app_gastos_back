@@ -35,4 +35,15 @@ export class GastosModel {
   async findOne(filtro: Record<string, any>): Promise<Gastos | null> {
     return await this.gastosModel.findOne(filtro).exec();
   }
+
+  async getByFilters(filtros: { ano?: number; mes?: number }): Promise<Gastos[]> {
+    const query: Record<string, any> = {};
+    if (filtros.ano !== undefined) {
+      query.ano = filtros.ano;
+    }
+    if (filtros.mes !== undefined) {
+      query.mes = filtros.mes;
+    }
+    return await this.gastosModel.find(query).exec();
+  }
 }
