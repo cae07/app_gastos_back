@@ -1,14 +1,16 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "functions": {
     "api/index.ts": {
       "memory": 2048,
-      "maxDuration": 60
+      "maxDuration": 60,
+      "runtime": "nodejs20.x"
     }
   },
   "routes": [
-    { "src": "/(.*)", "dest": "/api/index.ts" }
+    { "src": "/(.*)", "dest": "/api/index.js" }
   ],
-  "buildCommand": "npm run build",
   "env": {
     "NODE_ENV": "production"
   }
