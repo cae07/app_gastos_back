@@ -2,13 +2,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ProductModule } from './Products/product.module';
-import { LancamentoModule } from './Lancamentos/lancamento.module';
-import { MedidasModule } from './Medidas/medidas.module';
-import { TipoDeProdutoModule } from './TiposDeProdutos/tiposDeProduto.module';
-import { EmbalagensModule } from './Embalagens/embalagens.module';
-import { TipoDeGastosModule } from './TiposDeGastos/tiposDeGastos.module';
-import { GastosModule } from './Gastos/gastos.module';
 import { HealthModule } from './Health/health.module';
 
 @Module({
@@ -17,6 +10,7 @@ import { HealthModule } from './Health/health.module';
       isGlobal: true,
     }),
 
+    // ✅ APENAS MongoDB GLOBAL (sem conectar ainda)
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -29,11 +23,11 @@ import { HealthModule } from './Health/health.module';
 
         return {
           uri,
+          autoConnect: false,  // ✅ NÃO conecta automaticamente
           serverSelectionTimeoutMS: 10000,
           connectTimeoutMS: 10000,
           bufferCommands: false,
           socketTimeoutMS: 45000,
-          // Otimizações para serverless/Lambda
           maxPoolSize: 1,
           minPoolSize: 0,
           retryWrites: true,
@@ -41,14 +35,20 @@ import { HealthModule } from './Health/health.module';
       },
     }),
 
+    // ✅ APENAS Health para serverless rodar rápido
     HealthModule,
-    ProductModule,
-    LancamentoModule,
-    TipoDeProdutoModule,
-    MedidasModule,
-    EmbalagensModule,
-    TipoDeGastosModule,
-    GastosModule,
+    
+    // ⏸️ OUTROS MÓDULOS COMENTADOS (carregaremos lazy loading depois)
+    // ProductModule,
+    // LancamentoModule,
+    // TipoDeProdutoModule,
+    // MedidasModule,
+    // EmbalagensModule,
+    // TipoDeGastosModule,
+    // GastosModule,
+  ],
+})
+export class AppModule {}
   ],
 })
 export class AppModule {}
