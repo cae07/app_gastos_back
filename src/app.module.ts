@@ -49,6 +49,3 @@ import { HealthModule } from './Health/health.module';
   ],
 })
 export class AppModule {}
-  ],
-})
-export class AppModule {}
